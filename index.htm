@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Red Empresarial - Cisco Packet Tracer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --color-core: #dc3545;
+            --color-distribution: #fd7e14;
+            --color-access: #20c997;
+            --color-wireless: #6f42c1;
+            --color-voip: #0dcaf0;
+            --color-camera: #6610f2;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .network-device {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .network-device:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .core-layer {
+            border-left: 4px solid var(--color-core);
+        }
+        
+        .distribution-layer {
+            border-left: 4px solid var(--color-distribution);
+        }
+        
+        .access-layer {
+            border-left: 4px solid var(--color-access);
+        }
+        
+        .wireless-device {
+            border-left: 4px solid var(--color-wireless);
+        }
+        
+        .voip-device {
+            border-left: 4px solid var(--color-voip);
+        }
+        
+        .camera-device {
+            border-left: 4px solid var(--color-camera);
+        }
+        
+        .connection-line {
+            stroke: #6c757d;
+            stroke-width: 2;
+        }
+        
+        .department-card {
+            transition: all 0.3s ease;
+        }
+        
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .config-code {
+            background-color: #2b303b;
+            color: #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .network-topology {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: auto;
+        }
+        
+        .device-info-panel {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+        
+        .step-card {
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .vlan-badge {
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-diagram-3"></i> Simulador de Red Empresarial
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#topology">Topología</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#departments">Departamentos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#configuration">Configuración</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#voip">Telefonía IP</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#cameras">Cámaras</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-primary text-white py-5">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold">Implementación de Red Empresarial</h1>
+                    <p class="lead">Guía completa para diseñar y configurar una red empresarial con arquitectura en árbol utilizando Cisco Packet Tracer</p>
+                    <p>Incluye conectividad cableada, inalámbrica, telefonía IP y cámaras de vigilancia</p>
+                </div>
+                <div class="col-lg-4">
+                    <img src="https://static.vecteezy.com/system/resources/previews/009/307/529/non_2x/network-connection-background-abstract-design-vector.jpg" class="img-fluid rounded" alt="Red empresarial">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Left Sidebar - Navigation -->
+            <div class="col-lg-3">
+                <div class="sticky-top" style="top: 90px;">
+                    <div class="list-group">
+                        <a href="#topology" class="list-group-item list-group-item-action">Topología de Red</a>
+                        <a href="#departments" class="list-group-item list-group-item-action">Departamentos y VLANs</a>
+                        <a href="#configuration" class="list-group-item list-group-item-action">Configuración de Dispositivos</a>
+                        <a href="#voip" class="list-group-item list-group-item-action">Telefonía IP</a>
+                        <a href="#cameras" class="list-group-item list-group-item-action">Cámaras de Vigilancia</a>
+                        <a href="#implementation" class="list-group-item list-group-item-action">Implementación Paso a Paso</a>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header bg-dark text-white">
+                            <i class="bi bi-info-circle"></i> Información de la Red
+                        </div>
+                        <div class="card-body">
+                            <h6>Direccionamiento IP:</h6>
+                            <p class="small">192.168.0.0/16</p>
+                            
+                            <h6>Dominio:</h6>
+                            <p class="small">empresa.local</p>
+                            
+                            <h6>Servidores:</h6>
+                            <ul class="small">
+                                <li>DHCP: 192.168.100.10</li>
+                                <li>DNS: 192.168.100.11</li>
+                                <li>Telefonía: 192.168.200.10</li>
+                                <li>Vigilancia: 192.168.250.10</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Topology Section -->
+                <section id="topology" class="mb-5">
+                    <h2 class="mb-4 border-bottom pb-2">Topología de Red</h2>
+                    <div class="network-topology p-4 mb-4">
+                        <h4 class="mb-3">Arquitectura en Árbol de Tres Niveles</h4>
+                        
+                        <div class="d-flex justify-content-between mb-4">
+                            <div class="text-center">
+                                <div class="bg-danger bg-opacity-25 p-3 rounded">
+                                    <h5><i class="bi bi-hdd-stack"></i> Núcleo (Core)</h5>
+                                    <p class="mb-0">Switch Multilayer 3560</p>
+                                    <small>Alta velocidad y redundancia</small>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-warning bg-opacity-25 p-3 rounded">
+                                    <h5><i class="bi bi-hdd"></i> Distribución</h5>
+                                    <p class="mb-0">Switches 2960</p>
+                                    <small>Agregación y políticas</small>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-success bg-opacity-25 p-3 rounded">
+                                    <h5><i class="bi bi-hdd"></i> Acceso</h5>
+                                    <p class="mb-0">Switches 2960 PoE</p>
+                                    <small>Conexión dispositivos finales</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-4">
+                            <img src="https://www.computernetworkingnotes.org/images/cisco/ccna-study-guide/rt05-03-tree-topology.png" class="img-fluid rounded" alt="Arquitectura en árbol">
+                            <p class="text-muted mt-2">Diagrama de la arquitectura en árbol con tres niveles</p>
+                        </div>
+                        
+                        <h5>Dispositivos Utilizados</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="card network-device core-layer">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="bi bi-hdd-stack text-danger"></i> Switch Núcleo</h5>
+                                        <p class="card-text">Cisco 3560 Multilayer</p>
+                                        <ul class="small">
+                                            <li>Puertos Gigabit Ethernet</li>
+                                            <li>Capacidad de enrutamiento</li>
+                                            <li>Alta disponibilidad</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card network-device distribution-layer">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="bi bi-hdd text-warning"></i> Switch Distribución</h5>
+                                        <p class="card-text">Cisco 2960</p>
+                                        <ul class="small">
+                                            <li>Agregación de tráfico</li>
+                                            <li>Políticas de seguridad</li>
+                                            <li>Control de acceso</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card network-device access-layer">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="bi bi-hdd text-success"></i> Switch Acceso</h5>
+                                        <p class="card-text">Cisco 2960 PoE</p>
+                                        <ul class="small">
+                                            <li>Alimentación PoE</li>
+                                            <li>Conexión dispositivos finales</li>
+                                            <li>Segmentación VLAN</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Departments Section -->
+                <section id="departments" class="mb-5">
+                    <h2 class="mb-4 border-bottom pb-2">Departamentos y VLANs</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Departamento</th>
+                                    <th>VLAN</th>
+                                    <th>Dirección de Red</th>
+                                    <th>Dispositivos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Dirección General</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 10</span></td>
+                                    <td>192.168.10.0/24</td>
+                                    <td>5 PCs, 3 Teléfonos IP, 2 impresoras</td>
+                                </tr>
+                                <tr>
+                                    <td>Recursos Humanos</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 20</span></td>
+                                    <td>192.168.20.0/24</td>
+                                    <td>8 PCs, 4 Teléfonos IP, 1 impresora</td>
+                                </tr>
+                                <tr>
+                                    <td>Finanzas</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 30</span></td>
+                                    <td>192.168.30.0/24</td>
+                                    <td>6 PCs, 3 Teléfonos IP, 1 impresora</td>
+                                </tr>
+                                <tr>
+                                    <td>Contabilidad</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 40</span></td>
+                                    <td>192.168.40.0/24</td>
+                                    <td>7 PCs, 4 Teléfonos IP, 1 impresora</td>
+                                </tr>
+                                <tr>
+                                    <td>Producción</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 50</span></td>
+                                    <td>192.168.50.0/24</td>
+                                    <td>15 PCs, 8 Teléfonos IP, 3 impresoras</td>
+                                </tr>
+                                <tr>
+                                    <td>I+D</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 60</span></td>
+                                    <td>192.168.60.0/24</td>
+                                    <td>10 PCs, 5 Teléfonos IP, 2 impresoras</td>
+                                </tr>
+                                <tr>
+                                    <td>WiFi Empleados</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 100</span></td>
+                                    <td>192.168.100.0/24</td>
+                                    <td>30 dispositivos inalámbricos</td>
+                                </tr>
+                                <tr>
+                                    <td>WiFi Invitados</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 200</span></td>
+                                    <td>192.168.200.0/24</td>
+                                    <td>Acceso limitado a Internet</td>
+                                </tr>
+                                <tr>
+                                    <td>Telefonía IP</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 250</span></td>
+                                    <td>192.168.250.0/24</td>
+                                    <td>40 Teléfonos IP</td>
+                                </tr>
+                                <tr>
+                                    <td>Vigilancia</td>
+                                    <td><span class="badge bg-primary vlan-badge">VLAN 300</span></td>
+                                    <td>192.168.300.0/24</td>
+                                    <td>12 Cámaras IP, Servidor de video</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Configuration Section -->
+                <section id="configuration" class="mb-5">
+                    <h2 class="mb-4 border-bottom pb-2">Configuración de Dispositivos</h2>
+                    
+                    <div class="accordion" id="configAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                    Configuración de VLANs
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <p>Creación de VLANs para cada departamento en los switches:</p>
+                                    <div class="config-code">
+                                        <span class="text-info">Switch#</span> configure terminal<br>
+                                        <span class="text-info">Switch(config)#</span> vlan 10<br>
+                                        <span class="text-info">Switch(config-vlan)#</span> name Direccion_General<br>
+                                        <span class="text-info">Switch(config-vlan)#</span> exit<br>
+                                        <span class="text-info">Switch(config)#</span> vlan 20<br>
+                                        <span class="text-info">Switch(config-vlan)#</span> name Recursos_Humanos<br>
+                                        <span class="text-info">Switch(config-vlan)#</span> exit<br>
+                                        <span class="text-info">Switch(config)#</span> vlan 30<br>
+                                        <span class="text-info">Switch(config-vlan)#</span> name Finanzas<br>
+                                        <span class="text-info">Switch(config-vlan)#</span> exit<br>
+                                        <span class="text-muted">// ... repetir para cada VLAN</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                    Configuración de Enlaces Troncales
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <p>Configuración de puertos troncales entre switches:</p>
+                                    <div class="config-code">
+                                        <span class="text-info">Switch(config)#</span> interface gigabitethernet 0/1<br>
+                                        <span class="text-info">Switch(config-if)#</span> switchport mode trunk<br>
+                                        <span class="text-info">Switch(config-if)#</span> switchport trunk encapsulation dot1q<br>
+                                        <span class="text-info">Switch(config-if)#</span> switchport trunk allowed vlan 10,20,30,40,50,60,100,200,250,300<br>
+                                        <span class="text-info">Switch(config-if)#</span> no shutdown<br>
+                                        <span class="text-info">Switch(config-if)#</span> exit
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                    Configuración de Enrutamiento Inter-VLAN
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <p>Habilitar el enrutamiento entre VLANs en el switch multicapa:</p>
+                                    <div class="config-code">
+                                        <span class="text-info">Switch(config)#</span> ip routing<br><br>
+                                        <span class="text-info">Switch(config)#</span> interface vlan 10<br>
+                                        <span class="text-info">Switch(config-if)#</span> ip address 192.168.10.1 255.255.255.0<br>
+                                        <span class="text-info">Switch(config-if)#</span> no shutdown<br>
+                                        <span class="text-info">Switch(config-if)#</span> exit<br><br>
+                                        <span class="text-info">Switch(config)#</span> interface vlan 20<br>
+                                        <span class="text-info">Switch(config-if)#</span> ip address 192.168.20.1 255.255.255.0<br>
+                                        <span class="text-info">Switch(config-if)#</span> no shutdown<br>
+                                        <span class="text-info">Switch(config-if)#</span> exit<br><br>
+                                        <span class="text-muted">// ... repetir para cada VLAN</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- VoIP Section -->
+                <section id="voip" class="mb-5">
+                    <h2 class="mb-4 border-bottom pb-2">Configuración de Telefonía IP</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card voip-device h-100">
+                                <div class="card-body">
+                                    <h4 class="card-title"><i class="bi bi-telephone text-info"></i> Configuración de Call Manager Express</h4>
+                                    <p>Configuración básica del router para servir como Call Manager Express:</p>
+                                    <div class="config-code small">
+                                        <span class="text-info">Router#</span> configure terminal<br>
+                                        <span class="text-info">Router(config)#</span> telephony-service<br>
+                                        <span class="text-info">Router(config-telephony)#</span> max-ephones 50<br>
+                                        <span class="text-info">Router(config-telephony)#</span> max-dn 100<br>
+                                        <span class="text-info">Router(config-telephony)#</span> ip source-address 192.168.250.1<br>
+                                        <span class="text-info">Router(config-telephony)#</span> auto assign 1 to 100<br>
+                                        <span class="text-info">Router(config-telephony)#</span> exit<br><br>
+                                        <span class="text-info">Router(config)#</span> ephone-dn 1<br>
+                                        <span class="text-info">Router(config-ephone-dn)#</span> number 1001<br>
+                                        <span class="text-info">Router(config-ephone-dn)#</span> exit<br><br>
+                                        <span class="text-info">Router(config)#</span> ephone 1<br>
+                                        <span class="text-info">Router(config-ephone)#</span> mac-address 001B.D50A.1234<br>
+                                        <span class="text-info">Router(config-ephone)#</span> type 7960<br>
+                                        <span class="text-info">Router(config-ephone)#</span> button 1:1<br>
+                                        <span class="text-info">Router(config-ephone)#</span> exit
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h4 class="card-title"><i class="bi bi-info-circle"></i> Guía de Configuración</h4>
+                                    <ol>
+                                        <li>Acceder al router mediante consola o SSH</li>
+                                        <li>Entrar en modo de configuración global con <code>configure terminal</code></li>
+                                        <li>Configurar el servicio de telefonía con <code>telephony-service</code></li>
+                                        <li>Establecer los parámetros básicos (número máximo de teléfonos, extensiones)</li>
+                                        <li>Definir la dirección IP del servidor de telefonía</li>
+                                        <li>Crear las extensiones (ephone-dn) con sus números</li>
+                                        <li>Registrar los teléfonos físicos por su dirección MAC</li>
+                                        <li>Asignar extensiones a los botones de los teléfonos</li>
+                                        <li>Configurar las rutas de marcación para llamadas externas</li>
+                                    </ol>
+                                    <div class="alert alert-info">
+                                        <strong>Nota:</strong> Los teléfonos IP deben estar conectados a puertos PoE y en la VLAN correcta (VLAN 250).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Cameras Section -->
+                <section id="cameras" class="mb-5">
+                    <h2 class="mb-4 border-bottom pb-2">Configuración de Cámaras de Vigilancia</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card camera-device h-100">
+                                <div class="card-body">
+                                    <h4 class="card-title"><i class="bi bi-camera-video text-primary"></i> Configuración de Cámaras IP</h4>
+                                    <p>Configuración básica de una cámara IP en Cisco Packet Tracer:</p>
+                                    <ol>
+                                        <li>Arrastrar una cámara IP (Generic IP Camera) al área de trabajo</li>
+                                        <li>Conectarla a un switch de acceso con PoE</li>
+                                        <li>Configurar la dirección IP estática o DHCP</li>
+                                        <li>Asegurarse de que está en la VLAN de vigilancia (300)</li>
+                                        <li>Configurar el servidor de video para grabación</li>
+                                    </ol>
+                                    <div class="config-code small">
+                                        <span class="text-muted">// Desde la interfaz gráfica de la cámara:</span><br>
+                                        1. Hacer clic en la cámara > Config<br>
+                                        2. Establecer dirección IP: 192.168.300.11<br>
+                                        3. Máscara: 255.255.255.0<br>
+                                        4. Gateway: 192.168.300.1<br>
+                                        5. Servidor DNS: 192.168.100.11<br>
+                                        6. Servidor de video: 192.168.300.10<br>
+                                        7. Guardar configuración
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h4 class="card-title"><i class="bi bi-server"></i> Configuración del Servidor de Video</h4>
+                                    <p>Configuración del servidor para gestionar las cámaras:</p>
+                                    <ol>
+                                        <li>Agregar un servidor genérico al área de trabajo</li>
+                                        <li>Conectarlo al switch de acceso correspondiente</li>
+                                        <li>Configurar la dirección IP estática (192.168.300.10)</li>
+                                        <li>Instalar el software de vigilancia (simulado en Packet Tracer)</li>
+                                        <li>Agregar las cámaras por sus direcciones IP</li>
+                                        <li>Configurar las opciones de grabación y almacenamiento</li>
+                                    </ol>
+                                    <div class="config-code small">
+                                        <span class="text-muted">// Desde la interfaz del servidor:</span><br>
+                                        1. Hacer clic en el servidor > Services > Video Surveillance<br>
+                                        2. Habilitar el servicio<br>
+                                        3. Agregar nueva cámara: 192.168.300.11<br>
+                                        4. Establecer nombre y ubicación<br>
+                                        5. Configurar modo de grabación: continua o por detección de movimiento<br>
+                                        6. Establecer calidad de video y retención<br>
+                                        7. Guardar configuración
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Implementation Steps -->
+                <section id="implementation" class="mb-5">
+                    <h2 class="mb-4 border-bottom pb-2">Implementación Paso a Paso</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card step-card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Paso 1: Diseño de la Topología</h5>
+                                    <p class="card-text">Colocar los dispositivos en el área de trabajo de Cisco Packet Tracer según la arquitectura en árbol:</p>
+                                    <ul>
+                                        <li>Ubicar el switch de núcleo en el centro</li>
+                                        <li>Conectar switches de distribución al núcleo</li>
+                                        <li>Conectar switches de acceso a los de distribución</li>
+                                        <li>Colocar routers para conectividad externa</li>
+                                        <li>Ubicar los dispositivos finales en sus departamentos</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="card step-card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Paso 2: Configuración de Dispositivos de Red</h5>
+                                    <p class="card-text">Configurar switches, routers y puntos de acceso:</p>
+                                    <ul>
+                                        <li>Establecer nombres de dispositivos</li>
+                                        <li>Configurar contraseñas de acceso</li>
+                                        <li>Crear y asignar VLANs</li>
+                                        <li>Configurar enlaces troncales</li>
+                                        <li>Habilitar enrutamiento inter-VLAN</li>
+                                        <li>Configurar DHCP para asignación automática de IPs</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="card step-card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Paso 3: Implementación de Servicios</h5>
+                                    <p class="card-text">Configurar servicios de red esenciales:</p>
+                                    <ul>
+                                        <li>Servidor DHCP para asignación automática de direcciones IP</li>
+                                        <li>Servidor DNS para resolución de nombres</li>
+                                        <li>Servidor de telefonía IP (Call Manager Express)</li>
+                                        <li>Servidor de video vigilancia</li>
+                                        <li>Configurar acceso a Internet mediante NAT</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="card step-card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Paso 4: Configuración de Dispositivos Finales</h5>
+                                    <p class="card-text">Configurar PCs, teléfonos IP y cámaras:</p>
+                                    <ul>
+                                        <li>Asignar direcciones IP estáticas o verificar obtención vía DHCP</li>
+                                        <li>Configurar puertas de enlace y servidores DNS</li>
+                                        <li>Registrar teléfonos IP en el Call Manager</li>
+                                        <li>Configurar cámaras IP y asociarlas al servidor de video</li>
+                                        <li>Verificar conectividad entre dispositivos</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="card step-card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Paso 5: Pruebas y Verificación</h5>
+                                    <p class="card-text">Realizar pruebas exhaustivas de la red:</p>
+                                    <ul>
+                                        <li>Pruebas de conectividad dentro de la misma VLAN (ping)</li>
+                                        <li>Pruebas de conectividad entre diferentes VLANs</li>
+                                        <li>Verificación de funcionamiento de telefonía IP</li>
+                                        <li>Comprobación del sistema de videovigilancia</li>
+                                        <li>Pruebas de conectividad a Internet</li>
+                                        <li>Verificación de acceso inalámbrico para empleados e invitados</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Simulador de Red Empresarial</h5>
+                    <p>Guía completa para implementación de red con Cisco Packet Tracer</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">Para fines educativos - Trabajo de Fin de Grado</p>
+                    <p>© 2023 - Todos los derechos reservados</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Funcionalidad básica para la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simular funcionalidad de selección de dispositivos
+            const networkDevices = document.querySelectorAll('.network-device');
+            
+            networkDevices.forEach(device => {
+                device.addEventListener('click', function() {
+                    // Remover clase activa de todos los dispositivos
+                    networkDevices.forEach(d => d.classList.remove('border-primary'));
+                    
+                    // Añadir clase activa al dispositivo seleccionado
+                    this.classList.add('border-primary');
+                    
+                    // Aquí se podría expandir para mostrar información detallada del dispositivo
+                    console.log('Dispositivo seleccionado: ', this.querySelector('.card-title').textContent);
+                });
+            });
+            
+            // Smooth scrolling para los enlaces de navegación
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
